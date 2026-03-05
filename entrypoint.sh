@@ -13,19 +13,18 @@ fi
 FB_USERNAME="${FB_USERNAME:-admin}"
 FB_PASSWORD="${FB_PASSWORD:-admin}"
 
-# Initialize database only if it doesn't exist
-if [ ! -f "$DB_PATH" ]; then
-    echo "Initializing FileBrowser database..."
-
-    filebrowser -d "$DB_PATH" users add \
-        "$FB_USERNAME" \
-        "$FB_PASSWORD" \
-        --perm.admin
-
+# Always try to ensure admin user exists
+echo "Ensuring admin user exists..."
+if filebrowser -d "$DB_PATH" users add \
+    "$FB_USERNAME" \
+    "$FB_PASSWORD" \
+    --perm.admin; then
     echo "Admin user created:"
     echo "  Username: $FB_USERNAME"
     echo "  Password: $FB_PASSWORD"
+else
+    echo "Admin user already exists or could not be created; continuing startup."
 fi
 
-# Start FileBrowser
+# Start Filebrowser
 exec filebrowser -d "$DB_PATH" --config "$CONFIG_PATH"
